@@ -64,7 +64,7 @@ public class JsonSQL<T extends Identifiable> {
     }
 
     //сохраняет данные в файл.
-    public void saveData(List<T> data) {
+    public synchronized void saveData(List<T> data) {
         try (Writer writer = new FileWriter(path)) {
             gson.toJson(data, writer);
             isCacheDirty = true;
