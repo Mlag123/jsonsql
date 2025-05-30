@@ -14,25 +14,17 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static Utils.Constants.DB_FILE;
+import static Utils.Constants.DB_PATH;
 
-/*
-      Хранение должно быть такое.
-      ключ:объект
-      к примеру
-      id:user
-      2265:emil
- */
 public class JsonSQL<T extends Identifiable> {
     private Gson gson = new Gson();
-    private String path = "./database";
+    private String path = DB_PATH + "/database.json";
     private Class<T> type;
-    private File dir = new File(path);
-    private File file = new File(DB_FILE);
+    private File dir = new File(DB_PATH);
+    private File file = new File(path);
 
 
     public JsonSQL(Class<T> type) throws IOException {
-
-
         this.type = type;
         //создания папки и файла.
         if (!dir.exists()) {
@@ -57,7 +49,7 @@ public class JsonSQL<T extends Identifiable> {
         }
 
 
-        try (Reader reader = new FileReader(DB_FILE)) {
+        try (Reader reader = new FileReader(path)) {
             Type dataListType = TypeToken.getParameterized(ArrayList.class, type).getType();
             return gson.fromJson(reader, dataListType);
         } catch (FileNotFoundException e) {
@@ -69,7 +61,7 @@ public class JsonSQL<T extends Identifiable> {
 
     //сохраняет данные в файл.
     public void saveData(List<T> data) {
-        try (Writer writer = new FileWriter(Constants.DB_FILE)) {
+        try (Writer writer = new FileWriter(path)) {
             gson.toJson(data, writer);
 
         } catch (IOException e) {
@@ -111,25 +103,25 @@ public class JsonSQL<T extends Identifiable> {
     }
 
     //возвращает объект по айди.
-    public String getObjectByID(String id,String errorMsg) {
+    public String getObjectByID(String id, String errorMsg) {
         List<T> data = loadData();
-        return findAndSerialize(obj -> obj.getId().equals(id),errorMsg);// Сериализуем объект в JSON-строку
+        return findAndSerialize(obj -> obj.getId().equals(id), errorMsg);// Сериализуем объект в JSON-строку
 
 
     }
 
     //Опционально, возвращает объект по его логину и паролю
-    public String getObjectByLoginAndPassowrd(String login, String password,String errorMsg) {
+    public String getObjectByLoginAndPassowrd(String login, String password, String errorMsg) {
         List<T> data = loadData();
 
-        return findAndSerialize(obj ->obj.getLogin().equals(login)&&obj.getPassword().equals(password),errorMsg);
+        return findAndSerialize(obj -> obj.getLogin().equals(login) && obj.getPassword().equals(password), errorMsg);
     }
 
     //Опционально, возвращает объект по его логину
-    public String getObjectByLogin(String login,String errorMsg) {
+    public String getObjectByLogin(String login, String errorMsg) {
         List<T> data = loadData();
 
-        return findAndSerialize(obj ->obj.getLogin().equals(login),errorMsg);
+        return findAndSerialize(obj -> obj.getLogin().equals(login), errorMsg);
     }
 
     private String findAndSerialize(Predicate<T> condition, String errorMsg) {
@@ -137,9 +129,8 @@ public class JsonSQL<T extends Identifiable> {
                 .filter(condition)
                 .findFirst()
                 .map(gson::toJson)
-                .orElseThrow(() -> new RuntimeException(errorMsg+" "+condition));
+                .orElseThrow(() -> new RuntimeException(errorMsg + " " + condition));
     }
-
 
 
 }

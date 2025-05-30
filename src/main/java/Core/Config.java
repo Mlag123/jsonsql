@@ -2,67 +2,85 @@ package Core;
 
 import Utils.Constants;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Type;
 
 
 public class Config {
-    private String config_path_folder = "./config";
-    private String config_path = "./config/config.json";
-    private configs defConfig = new configs(Constants.DB_FILE);
 
-    public Config(){
-      File file_to_folder = new File(config_path_folder);
-      File fileConfig = new File(config_path);
+    private final String config_path_folder = "./config";
+    private final String config_path_file = "./config/configSQL.json";
+    private Configures defConfig = new Configures(Constants.DB_PATH_DEF);
+    private File dir;
+    private File file;
+    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private Configures configs;
 
-      if (!file_to_folder.mkdirs()){
-          file_to_folder.mkdirs();
-      }
-      if (!fileConfig.isFile()){
-          try {
-              fileConfig.createNewFile();
-          } catch (IOException e) {
-              throw new RuntimeException(e);
-          }
-      }
-      writeConfig();
+    public Configures getConfigs() {
+        return configs;
     }
 
-    private Gson gson = new Gson();
+    public Config() {
+        initFolders();
+        configs = loadConfig();
+    }
 
-    private void writeConfig(){
-        String json = gson.toJson(defConfig);
-        if (new File(config_path).isFile()){
-            File fileConfig = new File(config_path);
+    //создает папки и файл конфигурации.
+    private void initFolders() {
+        dir = new File(config_path_folder);
+        file = new File(config_path_file);
+
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        if (!file.exists()) {
             try {
-                FileWriter fw = new FileWriter(fileConfig);
-                fw.write(json);
-                fw.flush();
-                fw.close();
+                file.createNewFile();
+                writeConfig();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    public static void main(String[] args) {
-        new Config();
+
+    //записывает в файл дефолтный конфиг.
+    private void writeConfig() {
+        if (!file.exists()) {
+            throw new RuntimeException("Config folder is not exists");
+        }
+
+
+        String json = gson.toJson(defConfig);
+
+        File fileConfig = new File(config_path_file);
+        try {
+            FileWriter fw = new FileWriter(fileConfig);
+            fw.write(json);
+            fw.flush();
+            fw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
+
+    //загружает из файла конфиг.
+    private Configures loadConfig() {
+        try (Reader reader = new FileReader(config_path_file)) {
+            return gson.fromJson(reader, Configures.class);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
+    }
+
 
 
 }
 
 
-class configs {
-    private String path;
 
-    public String getPath() {
-        return path;
-    }
-
-    public configs(String path) {
-        this.path = path;
-    }
-}
