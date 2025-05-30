@@ -2,11 +2,13 @@ package Core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
 import static Utils.Constants.DB_PATH;
 
 public class JsonSQL<T extends Identifiable> {
@@ -65,7 +67,7 @@ public class JsonSQL<T extends Identifiable> {
     //добавляет объект в файл.
 
     public void addData(T object) {
-        if (object == null) throw new IllegalArgumentException("Object cannot be null");
+        requireNonNull(object, "object");
         List<T> data = loadData();
         data.add(object);
         saveData(data);
@@ -81,8 +83,7 @@ public class JsonSQL<T extends Identifiable> {
 
     //обновляет объект находя его по айди.
     public boolean updateObject(String id, T newObject) {
-        if (newObject == null) throw new IllegalArgumentException("Object cannot be null");
-
+        requireNonNull(newObject, "newObject");
         List<T> data = loadData();
 
         for (int i = 0; i < data.size(); i++) {
@@ -97,23 +98,28 @@ public class JsonSQL<T extends Identifiable> {
 
     //возвращает объект по айди.
     public String getObjectByID(String id, String errorMsg) {
-        List<T> data = loadData();
         return findAndSerialize(obj -> obj.getId().equals(id), errorMsg);// Сериализуем объект в JSON-строку
 
 
     }
 
+    public static void requireNonNull(Object obj, String fieldName) {
+        if (obj == null) {
+            throw new IllegalArgumentException(fieldName + " cannot be null");
+        }
+    }
+
     //Опционально, возвращает объект по его логину и паролю
-    public String getObjectByLoginAndPassowrd(String login, String password, String errorMsg) {
-        List<T> data = loadData();
+    public String getObjectByLoginAndPassoword(String login, String password, String errorMsg) {
+        requireNonNull(login, "Login");
+        requireNonNull(password, "Password");
 
         return findAndSerialize(obj -> obj.getLogin().equals(login) && obj.getPassword().equals(password), errorMsg);
     }
 
     //Опционально, возвращает объект по его логину
     public String getObjectByLogin(String login, String errorMsg) {
-        List<T> data = loadData();
-
+        requireNonNull(login, "Login");
         return findAndSerialize(obj -> obj.getLogin().equals(login), errorMsg);
     }
 
@@ -124,6 +130,7 @@ public class JsonSQL<T extends Identifiable> {
                 .map(gson::toJson)
                 .orElseThrow(() -> new RuntimeException(errorMsg + " " + condition));
     }
+
 
 
 }
