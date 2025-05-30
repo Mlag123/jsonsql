@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static Utils.Constants.DB_FILE;
 
@@ -110,36 +111,35 @@ public class JsonSQL<T extends Identifiable> {
     }
 
     //возвращает объект по айди.
-    public String getObjectByID(String id) {
+    public String getObjectByID(String id,String errorMsg) {
         List<T> data = loadData();
-        return data.stream()
-                .filter(obj -> obj.getId().equals(id))
-                .findFirst()
-                .map(gson::toJson)
-                .orElseThrow();// Сериализуем объект в JSON-строку
+        return findAndSerialize(obj -> obj.getId().equals(id),errorMsg);// Сериализуем объект в JSON-строку
 
 
     }
 
     //Опционально, возвращает объект по его логину и паролю
-    public String getObjectByLoginAndPassowrd(String login, String password) {
+    public String getObjectByLoginAndPassowrd(String login, String password,String errorMsg) {
         List<T> data = loadData();
 
-        return data.stream().filter(obj -> obj.getLogin().equals(login) && obj.getPassword().equals(password))
-                .findFirst()
-                .map(gson::toJson)
-                .orElseThrow();
+        return findAndSerialize(obj ->obj.getLogin().equals(login)&&obj.getPassword().equals(password),errorMsg);
     }
 
     //Опционально, возвращает объект по его логину
-    public String getObjectByLogin(String login) {
+    public String getObjectByLogin(String login,String errorMsg) {
         List<T> data = loadData();
 
-        return data.stream().filter(obj -> obj.getLogin().equals(login))
+        return findAndSerialize(obj ->obj.getLogin().equals(login),errorMsg);
+    }
+
+    private String findAndSerialize(Predicate<T> condition, String errorMsg) {
+        return loadData().stream()
+                .filter(condition)
                 .findFirst()
                 .map(gson::toJson)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException(errorMsg+" "+condition));
     }
+
 
 
 }
