@@ -1,19 +1,12 @@
 package Core;
 
-import Core.Crypto.Crypto;
-import Utils.Constants;
-import Utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
-
-import static Utils.Constants.DB_FILE;
 import static Utils.Constants.DB_PATH;
 
 public class JsonSQL<T extends Identifiable> {
