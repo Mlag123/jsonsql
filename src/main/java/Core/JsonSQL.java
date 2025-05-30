@@ -17,6 +17,8 @@ public class JsonSQL<T extends Identifiable> {
     private Class<T> type;
     private File dir = new File(DB_PATH);
     private File file = new File(path);
+    private List<T> cache;
+    private boolean isCacheDirty = true;
 
 
     public JsonSQL(Class<T> type) throws IOException {
@@ -37,28 +39,35 @@ public class JsonSQL<T extends Identifiable> {
 
     //выгружает данные из файла.
 
-    public List<T> loadData() {
+    public synchronized List<T> loadData() {
+        List<T> data;
 
+        if (!isCacheDirty && cache != null) {
+            return cache;
+        }
         if (!file.exists() || file.length() == 0) {
-            return new ArrayList<>(); // Возвращаем пустой список
+            data = new ArrayList<>(); // Возвращаем пустой список
+        } else {
+            try (Reader reader = new FileReader(path)) {
+                Type dataListType = TypeToken.getParameterized(ArrayList.class, type).getType();
+                data = gson.fromJson(reader, dataListType);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+        cache = data;
+        isCacheDirty = false;
+        return data;
 
-
-        try (Reader reader = new FileReader(path)) {
-            Type dataListType = TypeToken.getParameterized(ArrayList.class, type).getType();
-            return gson.fromJson(reader, dataListType);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     //сохраняет данные в файл.
     public void saveData(List<T> data) {
         try (Writer writer = new FileWriter(path)) {
             gson.toJson(data, writer);
-
+            isCacheDirty = true;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -130,7 +139,6 @@ public class JsonSQL<T extends Identifiable> {
                 .map(gson::toJson)
                 .orElseThrow(() -> new RuntimeException(errorMsg + " " + condition));
     }
-
 
 
 }
