@@ -15,9 +15,19 @@ JsonSQL _jsonSQL = new JsonSQL(User.class);
 ```java
 public JsonSQL(Class<T> type){}
 ```
-
  
 Будьте внимательны, конструктор может вернуть `IOException!`
+
+Важно, что бы объект, который передается в конструктор `JsonSQL(User.class);`
+Должен реализовать интерфейс `Identifiable!`
+
+Пример:
+
+```java
+public class User implements Identifiable{}
+```
+
+`Identifiable` - реализует три функции. `getId`,`getLogin`,и `getPassword`.
 
 ### Функции
 `saveData(List<T> data);`  - записывает в файл `database.json` массив из объектов любого типа.
