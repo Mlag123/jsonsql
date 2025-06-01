@@ -52,7 +52,7 @@ public class JsonSQL<T extends Identifiable> {
             data = new ArrayList<>(); // Возвращаем пустой список
         } else {
             try (Reader reader = new FileReader(path)) {
-                Type dataListType = new TypeToken<ArrayList<T>>() {}.getType();
+                Type dataListType = TypeToken.getParameterized(List.class, type).getType();
                 data = gson.fromJson(reader, dataListType);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
