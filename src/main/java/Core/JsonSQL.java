@@ -20,6 +20,9 @@ public class JsonSQL<T extends Identifiable> {
     private List<T> cache;
     private boolean isCacheDirty = true;
 
+    public static void main(String[] args) {
+
+    }
 
     public JsonSQL(Class<T> type) throws IOException {
         this.type = type;
@@ -49,7 +52,7 @@ public class JsonSQL<T extends Identifiable> {
             data = new ArrayList<>(); // Возвращаем пустой список
         } else {
             try (Reader reader = new FileReader(path)) {
-                Type dataListType = TypeToken.getParameterized(ArrayList.class, type).getType();
+                Type dataListType = new TypeToken<ArrayList<T>>() {}.getType();
                 data = gson.fromJson(reader, dataListType);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);

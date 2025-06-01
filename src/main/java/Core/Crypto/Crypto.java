@@ -75,23 +75,5 @@ public class Crypto {
     }
 
 
-    @Deprecated
-    private static byte[] getValidKey(String key) {
-        byte[] keyBytes = key.getBytes();
-        int keyLength = 16;
-
-        if (keyBytes.length == keyLength) {
-            return keyBytes;
-        }
-
-        byte[] validKey = new byte[keyLength];
-        System.arraycopy(
-                keyBytes, 0,
-                validKey, 0,
-                Math.min(keyBytes.length, keyLength)
-        );
-        return validKey;
-    }
-
 
 }
