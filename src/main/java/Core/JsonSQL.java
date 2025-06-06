@@ -1,5 +1,6 @@
 package Core;
 
+import Utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -9,23 +10,48 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static Utils.Constants.DB_PATH;
+import static Utils.Constants.*;
 
 public class JsonSQL<T extends Identifiable> {
     private Gson gson = new Gson();
+    private String DB_PATH = DB_PATH_FROM_CONFIG;
     private String path = DB_PATH + "/database.json";
     private Class<T> type;
     private File dir = new File(DB_PATH);
-    private File file = new File(path);
+    private File file;
     private List<T> cache;
     private boolean isCacheDirty = true;
 
-    public static void main(String[] args) {
+
+    /// @param type     Тип объекта, который будет храниться в базе данных
+    /// @param fileName кастомное название файла
+    public JsonSQL(Class<T> type, String fileName) throws IOException {
+        this.type = type;
+
+        if (fileName.isEmpty() | fileName == null) {
+            try {
+                throw new IllegalArgumentException(fileName + " - is empty, or null, or incorrect");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        this.path = DB_PATH + "/" + fileName + Constants.JSON_TYPE;
+        initDir();
+    }
+
+    /// @param type Тип объекта, который будет храниться в базе данных
+
+    //use default nameFile;
+    public JsonSQL(Class<T> type) throws IOException {
+        this.type = type;
+        initDir();
+
 
     }
 
-    public JsonSQL(Class<T> type) throws IOException {
-        this.type = type;
+
+    private void initDir() throws IOException {
+        file = new File(path);
         //создания папки и файла.
         if (!dir.exists()) {
             dir.mkdir();
@@ -36,8 +62,6 @@ public class JsonSQL<T extends Identifiable> {
             file.createNewFile();
             saveData(new ArrayList<>());
         }
-
-
     }
 
     //выгружает данные из файла.
@@ -49,7 +73,7 @@ public class JsonSQL<T extends Identifiable> {
             return cache;
         }
         if (!file.exists() || file.length() == 0) {
-            data = new ArrayList<>(); // Возвращаем пустой список
+            data = new ArrayList<>();
         } else {
             try (Reader reader = new FileReader(path)) {
                 Type dataListType = TypeToken.getParameterized(List.class, type).getType();
@@ -117,7 +141,11 @@ public class JsonSQL<T extends Identifiable> {
 
     public static void requireNonNull(Object obj, String fieldName) {
         if (obj == null) {
-            throw new IllegalArgumentException(fieldName + " cannot be null");
+            try {
+                throw new IllegalArgumentException(fieldName + " cannot be null");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

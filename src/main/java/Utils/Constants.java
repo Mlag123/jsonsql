@@ -12,7 +12,10 @@ public class Constants {
     public static final int KEY_LENGTH = 128; // 128, 192 или 256
     public static final int ITERATIONS = 65536;
     public static final String DB_FILE = "./database/database.json";
-    public static final String DB_PATH = new Config().getConfigs().getPath();
+    public static final String DB_PATH_FROM_CONFIG = new Config().getConfigs().getPath();
     public static final String DB_PATH_DEF = "./database";
+    public static final String DEF_FILE_NAME = "database";
+    public static final String JSON_TYPE = ".json";
+
 
 }

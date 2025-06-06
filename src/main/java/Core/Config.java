@@ -10,6 +10,7 @@ public class Config {
 
     private final String config_path_folder = "./config";
     private final String config_path_file = "./config/configSQL.json";
+
     private Configures defConfig = new Configures(Constants.DB_PATH_DEF);
     private File dir;
     private File file;
@@ -24,6 +25,7 @@ public class Config {
         initFolders();
         configs = loadConfig();
     }
+
 
     //создает папки и файл конфигурации.
     private void initFolders() {
