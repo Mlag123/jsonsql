@@ -24,7 +24,7 @@ public JsonSQL(Class<T> type,String fileName){}
 Пример:
 
 ```java
-JsonSQL _jsonSQL = new JsonSQL(User.class,"UserDB);
+JsonSQL _jsonSQL = new JsonSQL(User.class,"UserDB");
 
 ```
  
