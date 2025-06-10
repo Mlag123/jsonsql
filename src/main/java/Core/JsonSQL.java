@@ -102,7 +102,7 @@ public class JsonSQL<T extends Identifiable> {
 
     //добавляет объект в файл.
 
-    public void addData(T object) {
+    public synchronized void addData(T object) {
         requireNonNull(object, "object");
         List<T> data = loadData();
         data.add(object);
@@ -110,7 +110,7 @@ public class JsonSQL<T extends Identifiable> {
     }
 
     //удаляет объект из файла по id.
-    public boolean removeObjectById(String id) {
+    public synchronized boolean removeObjectById(String id) {
         List<T> data = loadData();
         boolean remove = data.removeIf(T -> T.getId().equals(id));
         saveData(data);
@@ -118,7 +118,7 @@ public class JsonSQL<T extends Identifiable> {
     }
 
     //обновляет объект находя его по айди.
-    public boolean updateObject(String id, T newObject) {
+    public synchronized boolean updateObject(String id, T newObject) {
         requireNonNull(newObject, "newObject");
         List<T> data = loadData();
 
