@@ -13,7 +13,19 @@ JsonSQL _jsonSQL = new JsonSQL(User.class);
 
 Конструктор
 ```java
+//Конструктор без аргумента fileName, будет создан файл по дефолту dataBase.json
 public JsonSQL(Class<T> type){}
+//Конструктор c аргументом fileName
+public JsonSQL(Class<T> type,String fileName){}
+```
+
+Так же вы можете указать в конструкторе название файла для базы данных!
+
+Пример:
+
+```java
+JsonSQL _jsonSQL = new JsonSQL(User.class,"UserDB");
+
 ```
  
 Будьте внимательны, конструктор может вернуть `IOException!`
