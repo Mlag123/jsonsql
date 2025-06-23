@@ -7,7 +7,9 @@ import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static Utils.Constants.*;
@@ -19,8 +21,10 @@ public class JsonSQL<T extends Identifiable> {
     private Class<T> type;
     private File dir = new File(DB_PATH);
     private File file;
-    private List<T> cache;
+    private List<Map<String,T>> cache;
     private boolean isCacheDirty = true;
+    private Map<String,T> dataMap;
+    private Map<String,T> nullMap = new HashMap<>();
 
 
     /// @param type     Тип объекта, который будет храниться в базе данных
@@ -66,8 +70,8 @@ public class JsonSQL<T extends Identifiable> {
 
     //выгружает данные из файла.
 
-    public synchronized List<T> loadData() {
-        List<T> data;
+    public synchronized List<Map<String,T>> loadData() {
+        List<Map<String,T>> data;
 
         if (!isCacheDirty && cache != null) {
             return cache;
@@ -90,8 +94,7 @@ public class JsonSQL<T extends Identifiable> {
 
     }
 
-    //сохраняет данные в файл.
-    public synchronized void saveData(List<T> data) {
+    public synchronized void saveData(List<Map<String,T>> data) {
         try (Writer writer = new FileWriter(path)) {
             gson.toJson(data, writer);
             isCacheDirty = true;
@@ -100,25 +103,26 @@ public class JsonSQL<T extends Identifiable> {
         }
     }
 
+    //сохраняет данные в файл.
     //добавляет объект в файл.
 
-    public synchronized void addData(T object) {
+    public synchronized void addData(Map<String,T> object) {
         requireNonNull(object, "object");
-        List<T> data = loadData();
+        List<Map<String,T>> data = loadData();
         data.add(object);
         saveData(data);
     }
 
     //удаляет объект из файла по id.
-    public synchronized boolean removeObjectById(String id) {
+/*    public synchronized boolean removeObjectById(String id) {
         List<T> data = loadData();
         boolean remove = data.removeIf(T -> T.getId().equals(id));
         saveData(data);
         return remove;
-    }
+    }*/
 
     //обновляет объект находя его по айди.
-    public synchronized boolean updateObject(String id, T newObject) {
+/*    public synchronized boolean updateObject(String id, T newObject) {
         requireNonNull(newObject, "newObject");
         List<T> data = loadData();
 
@@ -130,14 +134,14 @@ public class JsonSQL<T extends Identifiable> {
             }
         }
         return false;
-    }
+    }*/
 
     //возвращает объект по айди.
-    public String getObjectByID(String id, String errorMsg) {
+  /*  public String getObjectByID(String id, String errorMsg) {
         return findAndSerialize(obj -> obj.getId().equals(id), errorMsg);// Сериализуем объект в JSON-строку
 
 
-    }
+    }*/
 
     public static void requireNonNull(Object obj, String fieldName) {
         if (obj == null) {
@@ -150,26 +154,26 @@ public class JsonSQL<T extends Identifiable> {
     }
 
     //Опционально, возвращает объект по его логину и паролю
-    public String getObjectByLoginAndPassoword(String login, String password, String errorMsg) {
+ /*   public String getObjectByLoginAndPassoword(String login, String password, String errorMsg) {
         requireNonNull(login, "Login");
         requireNonNull(password, "Password");
 
         return findAndSerialize(obj -> obj.getLogin().equals(login) && obj.getPassword().equals(password), errorMsg);
-    }
+    }*/
 
     //Опционально, возвращает объект по его логину
-    public String getObjectByLogin(String login, String errorMsg) {
+    /*public String getObjectByLogin(String login, String errorMsg) {
         requireNonNull(login, "Login");
         return findAndSerialize(obj -> obj.getLogin().equals(login), errorMsg);
-    }
+    }*/
 
-    private String findAndSerialize(Predicate<T> condition, String errorMsg) {
+ /*   private String findAndSerialize(Predicate<T> condition, String errorMsg) {
         return loadData().stream()
                 .filter(condition)
                 .findFirst()
                 .map(gson::toJson)
                 .orElseThrow(() -> new RuntimeException(errorMsg + " " + condition));
-    }
+    }*/
 
 
 }
