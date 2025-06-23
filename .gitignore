@@ -14,7 +14,7 @@ target/
 *.ipr
 database
 config
-src/test/*
+src/test/java/**
 
 ### Eclipse ###
 .apt_generated
